@@ -7,7 +7,6 @@
 
 namespace C3D
 {
-
     class Object :public ObjectBase
     {
     public:

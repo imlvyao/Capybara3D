@@ -48,11 +48,14 @@
 //}
 
 #include "Scene.h"
+#include "Transform.h"
 int main()
 {
     auto scene = std::make_shared<C3D::Scene>();
     auto camera = std::make_shared<C3D::Camera>();
     auto obj = std::make_shared<C3D::Object>();
+    auto trans1 = std::make_shared<C3D::Transform>();
+    obj->addComponent<C3D::Transform>(trans1);
     scene->addCamera(camera);
     scene->addObject(obj);
     scene->play();
