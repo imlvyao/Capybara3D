@@ -31,6 +31,12 @@ namespace C3D
 
     void Camera::update()
     {
+        const unsigned int SCR_WIDTH = 800;
+        const unsigned int SCR_HEIGHT = 600;
+
+        float lastX = (float)SCR_WIDTH / 2.0;
+        float lastY = (float)SCR_HEIGHT / 2.0;
+
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
