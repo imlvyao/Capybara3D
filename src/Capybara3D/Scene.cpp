@@ -1,101 +1,101 @@
 #include "Scene.h"
+#include "Utility/Timer.h"
 
-namespace C3D
+C3D::Scene::Scene()
 {
-    C3D::Scene::Scene()
-    {
-        init();
-    }
+    init();
+}
 
-    Scene::~Scene()
-    {
+C3D::Scene::~Scene()
+{
 
-    }
+}
 
-    void C3D::Scene::play()
+void C3D::Scene::play()
+{
+    while (!glfwWindowShouldClose(_window.get()))
     {
-        while (!glfwWindowShouldClose(_window.get()))
+        C3D::Timer timer;
+        timer.nowCpuTime();
+        for (auto& camera : _cameras)
         {
-            for (auto& camera: _cameras)
+            camera->update();
+            for (auto& obj : _objects)
             {
-                camera->update();
-                for (auto& obj : _objects)
-                {
-                    obj->update(camera->getShader());
-                }
-            }
-            glfwSwapBuffers(_window.get());
-            glfwPollEvents();
-        }
-    }
-
-    void Scene::stop()
-    {
-        for (auto& objs : _objects)
-        {
-            glDeleteVertexArrays(1, &objs->VAO);
-            glDeleteBuffers(1, &objs->VBO);
-        }
-        //glfwTerminate();
-    }
-
-    void C3D::Scene::addObject(const std::shared_ptr<Object> t)
-    {
-        _objects.push_back(t);
-        t->init();
-
-        for (auto& camera:_cameras)
-        {
-            auto uniforms = t->getUniforms();
-            for (const auto& uniform:uniforms)
-            {
-                camera->getShader()->setInt(uniform.first,uniform.second);
+                obj->update(camera->getShader());
             }
         }
+        glfwSwapBuffers(_window.get());
+        glfwPollEvents();
     }
+}
 
-    void Scene::addCamera(const std::shared_ptr<Camera> t)
+void C3D::Scene::stop()
+{
+    for (auto& objs : _objects)
     {
-        _cameras.push_back(t);
-        t->init();
+        glDeleteVertexArrays(1, &objs->VAO);
+        glDeleteBuffers(1, &objs->VBO);
+    }
+    //glfwTerminate();
+}
 
-        for (auto& objs : _objects)
+void C3D::Scene::addObject(const std::shared_ptr<Object> t)
+{
+    _objects.push_back(t);
+    t->init();
+
+    for (auto& camera : _cameras)
+    {
+        auto uniforms = t->getUniforms();
+        for (const auto& uniform : uniforms)
         {
-            auto uniforms = objs->getUniforms();
-            for (const auto& uniform : uniforms)
-            {
-                t->getShader()->setInt(uniform.first, uniform.second);
-            }
+            camera->getShader()->setInt(uniform.first, uniform.second);
         }
     }
+}
 
-    void C3D::Scene::init()
+void C3D::Scene::addCamera(const std::shared_ptr<Camera> t)
+{
+    _cameras.push_back(t);
+    t->init();
+
+    for (auto& objs : _objects)
     {
-        const unsigned int SCR_WIDTH = 800;
-        const unsigned int SCR_HEIGHT = 600;
-
-        float lastX = (float)SCR_WIDTH / 2.0;
-        float lastY = (float)SCR_HEIGHT / 2.0;
-        //TODO 都放到单独线程，或协程
-        glfwInit();
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-        _window = std::shared_ptr<GLFWwindow>
-            (glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL));
-        if (_window.get() == NULL)
+        auto uniforms = objs->getUniforms();
+        for (const auto& uniform : uniforms)
         {
-            glfwTerminate();
-            return;
+            t->getShader()->setInt(uniform.first, uniform.second);
         }
-        glfwMakeContextCurrent(_window.get());
+    }
+}
 
-        glfwSetInputMode(_window.get(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+void C3D::Scene::init()
+{
+    const unsigned int SCR_WIDTH = 800;
+    const unsigned int SCR_HEIGHT = 600;
 
-        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-        {
-            return;
-        }
+    float lastX = (float)SCR_WIDTH / 2.0;
+    float lastY = (float)SCR_HEIGHT / 2.0;
+    //TODO 都放到单独线程，或协程
+    glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    _window = std::shared_ptr<GLFWwindow>
+        (glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL));
+    if (_window.get() == NULL)
+    {
+        glfwTerminate();
+        return;
+    }
+    glfwMakeContextCurrent(_window.get());
+
+    glfwSetInputMode(_window.get(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        return;
     }
 }

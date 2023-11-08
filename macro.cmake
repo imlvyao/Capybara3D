@@ -30,6 +30,18 @@ macro(OUT_LIB target)
     endif(WIN32)
 endmacro()
 
+macro(LINKDLL_AND_COPY thisName dllName)
+    add_dependencies(${thisName} ${dllName})
+    target_link_libraries (${thisName} ${dllName})
+
+    add_custom_command(
+        TARGET ${thisName} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+                $<TARGET_FILE:${dllName}>
+                $<TARGET_FILE_DIR:${thisName}>
+    )
+endmacro()
+
 macro(ADD_LIB headerPath target)
     #aux_source_directory(. SRCS)
     file(GLOB ALL_SOURCES "*.cpp" "*.c" "${headerPath}/*.cpp" "${headerPath}/*.c")

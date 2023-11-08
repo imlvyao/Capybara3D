@@ -1,6 +1,6 @@
 include(${CMAKE_SOURCE_DIR}/macro.cmake)
 
-set(LIB_NAME Capybara3D)
+set(LIB_NAME Utility)
 set(HEADER_PATH ../../inc/${LIB_NAME})
 
 include_directories(${HEADER_PATH})
@@ -13,6 +13,9 @@ if(WIN32)
 	#add_compile_definitions(_SCL_SECURE_NO_WARNINGS)
 	#add_compile_definitions(_CONSOLE)
 	#add_compile_definitions(FD_SETSIZE=1024)
+
+	add_compile_definitions(GLAD_GLAPI_EXPORT_BUILD)	
+	add_compile_definitions(C3D_UTILITY_DLL)
 	link_directories(../../lib/glfw_vc2019)
 	link_libraries(opengl32.lib glfw3.lib glfw3dll.lib glfw3_mt.lib)
 	
@@ -31,10 +34,11 @@ elseif(UNIX)
 
 endif()
 
-ADD_EXE(${HEADER_PATH} ${LIB_NAME})
+ADD_LIB(${HEADER_PATH} ${LIB_NAME})
 
 # 依赖
-LINKDLL_AND_COPY(${LIB_NAME} Utility)
+#add_dependencies(${LIB_NAME} XXX)
+#target_link_libraries (${LIB_NAME} XXX)
 
 # 输出lib
 OUT_LIB(${LIB_NAME})
