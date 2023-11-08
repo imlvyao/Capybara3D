@@ -13,8 +13,7 @@ if(WIN32)
     set(CMAKE_CXX_STANDARD 14)
     set(CMAKE_CXX_STANDARD_REQUIRED True)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-    # OpenGL GLAD
-    add_compile_definitions(GLAD_GLAPI_EXPORT)
+
 elseif(UNIX)
     message(NOTICE "System Type:UNIX or Linux!")
     #set(CMAKE_C_COMPILER "/usr/bin/clang")
@@ -36,6 +35,8 @@ if(WIN32)
     #add_compile_definitions(UNICODE)
     #add_compile_definitions(_UNICODE)
     #add_compile_definitions(_TURN_OFF_PLATFORM_STRING)
+    # OpenGL GLAD
+    add_compile_definitions(GLAD_GLAPI_EXPORT)
 elseif(UNIX)
     #add_compile_definitions(UNICODE)
     #add_compile_definitions(_UNICODE)

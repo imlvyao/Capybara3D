@@ -125,18 +125,18 @@ namespace C3D
 
     void Object::update(std::shared_ptr<Shader> shader)
     {
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture1);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, texture2);
+        //glActiveTexture(GL_TEXTURE0);
+        //glBindTexture(GL_TEXTURE_2D, texture1);
+        //glActiveTexture(GL_TEXTURE1);
+        //glBindTexture(GL_TEXTURE_2D, texture2);
 
-        glBindVertexArray(VAO);
+        //glBindVertexArray(VAO);
 
-        glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-        float angle = 20.0f * 1;
-        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-        shader->setMat4("model", model);
+        //glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+        //model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+        //float angle = 20.0f * 1;
+        //model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+        //shader->setMat4("model", model);
 
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
