@@ -10,55 +10,87 @@ C3D::Scene::~Scene()
 {
 
 }
-
 void C3D::Scene::play()
 {
     while (!glfwWindowShouldClose(_window.get()))
     {
-        C3D::Timer timer;
-        timer.startGpuTimer();
-
+        auto t1 = C3D::Timer::nowCpuTime();
         for (auto& camera : _cameras)
         {
             camera->update();
-
-            glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-            model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-            float angle = 20.0f * 1;
-            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-            camera->getShader()->setMat4("model", model);
-
-            for (auto& obj : _objects)
+            for (size_t i = 0; i < 1000000; i++)
             {
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, obj->texture1);
-                glActiveTexture(GL_TEXTURE1);
-                glBindTexture(GL_TEXTURE_2D, obj->texture2);
-
-                glBindVertexArray(obj->VAO);
-
-                for (size_t i = 0; i < 1000000; i++)
+                for (auto& obj : _objects)
                 {
-                    glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-                    //model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-                    //float angle = 20.0f * 1+i%10;
-                    //model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-                    camera->getShader()->setMat4("model", model);
-                    //glActiveTexture(GL_TEXTURE0);
-                    //(i%2==0)? glBindTexture(GL_TEXTURE_2D, obj->texture1) :glBindTexture(GL_TEXTURE_2D, obj->texture2);
-                    //glActiveTexture(GL_TEXTURE1);
-                    //(i % 2 == 0) ? glBindTexture(GL_TEXTURE_2D, obj->texture2): glBindTexture(GL_TEXTURE_2D, obj->texture1);
-                    
                     obj->update(camera->getShader());
                 }
             }
         }
-        auto time = timer.endGpuTimer();
-        std::cout << "gpu time:" << time << std::endl;
         glfwSwapBuffers(_window.get());
         glfwPollEvents();
+        auto t4 = C3D::Timer::nowCpuTime();
+        std::cout << "frame time:" << t4 - t1 << std::endl;
     }
 }
+
+//void C3D::Scene::play()
+//{
+//    while (!glfwWindowShouldClose(_window.get()))
+//    {
+//        C3D::Timer timer;
+//        timer.startGpuTimer();
+//        auto t1 = C3D::Timer::nowCpuTime();
+//        for (auto& camera : _cameras)
+//        {
+//            camera->update();
+//
+//            glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+//            model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+//            float angle = 20.0f * 1;
+//            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+//            camera->getShader()->setMat4("model", model);
+//
+//            for (auto& obj : _objects)
+//            {
+//                glActiveTexture(GL_TEXTURE0);
+//                glBindTexture(GL_TEXTURE_2D, obj->texture1);
+//                glActiveTexture(GL_TEXTURE1);
+//                glBindTexture(GL_TEXTURE_2D, obj->texture2);
+//
+//                glBindVertexArray(obj->VAO);
+//
+//                for (size_t i = 0; i < 1000000; i++)
+//                {
+//                    glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+//                    model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+//                    float angle = 20.0f * 1+i%10;
+//                    model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+//                    camera->getShader()->setMat4("model", model);
+//                    glActiveTexture(GL_TEXTURE0);
+//                    (i%2==0)? glBindTexture(GL_TEXTURE_2D, obj->texture1) :glBindTexture(GL_TEXTURE_2D, obj->texture2);
+//                    glActiveTexture(GL_TEXTURE1);
+//                    (i % 2 == 0) ? glBindTexture(GL_TEXTURE_2D, obj->texture2): glBindTexture(GL_TEXTURE_2D, obj->texture1);
+//                    obj->update(camera->getShader());
+//                }
+//                for (size_t i = 0; i < 1000000; i++)
+//                {
+//                    //obj->update(camera->getShader());
+//                }
+//            }
+//        }
+//        auto t2 = C3D::Timer::nowCpuTime();
+//        auto time = timer.endGpuTimer();
+//        std::cout << "cpu time:" << t2-t1 << std::endl;
+//        std::cout << "gpu time:" << time << std::endl;
+//        auto t3 = C3D::Timer::nowCpuTime();
+//        glfwSwapBuffers(_window.get());
+//        auto t4 = C3D::Timer::nowCpuTime();
+//        glfwPollEvents();
+//        std::cout << "SwapBuffer time:" << t4 - t3 << std::endl;
+//
+//        std::cout << "frame time:" << t4 - t1 << std::endl;
+//    }
+//}
 
 void C3D::Scene::stop()
 {

@@ -27,6 +27,7 @@ long C3D::Timer::endGpuTimer()
 
     GLuint64 elapsed_time;
     glGetQueryObjectui64v(_gpuTimerQuery, GL_QUERY_RESULT, &elapsed_time);
+    glDeleteQueries(1, &_gpuTimerQuery);
 
     return elapsed_time / 1000000.0;
 }

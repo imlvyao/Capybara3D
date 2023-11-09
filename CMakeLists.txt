@@ -1,5 +1,24 @@
 # 为了使用nuget最低版本3.20
 cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
+# compile options
+if(WIN32)
+    # 字符集为Unicode
+    #add_compile_definitions(UNICODE)
+    #add_compile_definitions(_UNICODE)
+    #add_compile_definitions(_TURN_OFF_PLATFORM_STRING)
+    # OpenGL GLAD
+    add_compile_definitions(GLAD_GLAPI_EXPORT)
+    # 是否优化
+    add_compile_options(-fno-elide-constructors)
+
+elseif(UNIX)
+    #add_compile_definitions(UNICODE)
+    #add_compile_definitions(_UNICODE)
+    #add_compile_definitions(_TURN_OFF_PLATFORM_STRING)
+    #add_compile_options(-fPIC)
+    #add_compile_options(-ltcmalloc)
+    #add_compile_options(-fno-builtin-malloc -fno-builtin-calloc -fno-builtin-realloc -fno-builtin-free)
+endif()
 
 if(WIN32)
     message(NOTICE "System Type:Windows!")
@@ -13,6 +32,9 @@ if(WIN32)
     set(CMAKE_CXX_STANDARD 14)
     set(CMAKE_CXX_STANDARD_REQUIRED True)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
+    #关闭优化
+    set(CMAKE_CXX_FLAGS "-fno-elide-constructors ${CMAKE_CXX_FLAGS}")
 
 elseif(UNIX)
     message(NOTICE "System Type:UNIX or Linux!")
@@ -29,22 +51,6 @@ elseif(UNIX)
 endif()
 
 project(Capybara3D)
-
-# 字符集为Unicode
-if(WIN32)
-    #add_compile_definitions(UNICODE)
-    #add_compile_definitions(_UNICODE)
-    #add_compile_definitions(_TURN_OFF_PLATFORM_STRING)
-    # OpenGL GLAD
-    add_compile_definitions(GLAD_GLAPI_EXPORT)
-elseif(UNIX)
-    #add_compile_definitions(UNICODE)
-    #add_compile_definitions(_UNICODE)
-    #add_compile_definitions(_TURN_OFF_PLATFORM_STRING)
-    #add_compile_options(-fPIC)
-    #add_compile_options(-ltcmalloc)
-    #add_compile_options(-fno-builtin-malloc -fno-builtin-calloc -fno-builtin-realloc -fno-builtin-free)
-endif()
 
 #file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/config" DESTINATION ${CMAKE_BINARY_DIR})
 #file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/doc" DESTINATION ${CMAKE_BINARY_DIR})

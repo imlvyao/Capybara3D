@@ -7,7 +7,7 @@ namespace C3D
     class C3D_UTILITY_EXPORT Timer
     {
     public:
-        long nowCpuTime();
+        static long nowCpuTime();
 
         void startGpuTimer();
         long endGpuTimer();
