@@ -26,15 +26,17 @@ if(WIN32)
     #set(VCPKG_TARGET_ARCHITECTURE x64)
     set(VCPKG_CRT_LINKAGE dynamic)
     set(VCPKG_LIBRARY_LINKAGE dynamic)
-    set(VCPKG_PLATFORM_TOOLSET "v142")
-    set(VCPKG_DEP_INFO_OVERRIDE_VARS "v142")
+    set(VCPKG_PLATFORM_TOOLSET "v143")
+    set(VCPKG_DEP_INFO_OVERRIDE_VARS "v143")
     # C++标准版本
-    set(CMAKE_CXX_STANDARD 14)
+    set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_CXX_STANDARD_REQUIRED True)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
     #关闭优化
     set(CMAKE_CXX_FLAGS "-fno-elide-constructors ${CMAKE_CXX_FLAGS}")
+    # 设置 C++ 编译器标志
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0") # -O0 表示关闭优化
 
 elseif(UNIX)
     message(NOTICE "System Type:UNIX or Linux!")
