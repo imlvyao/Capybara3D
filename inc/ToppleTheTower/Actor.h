@@ -1,10 +1,12 @@
 #pragma once
 #include <vector>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/serialization/vector.hpp>
 #include "glm/glm.hpp"
 class ActorBase
 {
 public:
-
+	ActorBase(){}
 	ActorBase(const double& x, const double& y, const double& ar, const double& cr):
 	m_x(x),m_y(y), m_attackRadius(ar), m_collisionRadius(cr)
 	{}
@@ -33,6 +35,18 @@ public:
 	{
 		return m_collisionRadius;
 	}
+
+
+	friend class boost::serialization::access;
+
+	template <class Archive>
+	void serialize(Archive& ar, const unsigned int version)
+	{
+		ar& m_x;
+		ar& m_y;
+		ar& m_attackRadius;
+		ar& m_collisionRadius;
+	}
 private:
 	double m_x;
 	double m_y;
@@ -45,6 +59,14 @@ class Footman :public ActorBase
 public:
 	Footman(const double& x, const double& y, const double& ar, const double& cr) :ActorBase(x, y, ar, cr)
 	{}
+	Footman() {}
+	friend class boost::serialization::access;
+
+	template <class Archive>
+	void serialize(Archive& ar, const unsigned int version)
+	{
+		ar& boost::serialization::base_object<ActorBase>(*this);
+	}
 };
 
 class Tower :public ActorBase
@@ -52,7 +74,14 @@ class Tower :public ActorBase
 public:
 	Tower(const double& x, const double& y, const double& ar, const double& cr) :ActorBase(x,y,ar,cr)
 	{}
+	Tower(){}
+	friend class boost::serialization::access;
 
+	template <class Archive>
+	void serialize(Archive& ar, const unsigned int version)
+	{
+		ar& boost::serialization::base_object<ActorBase>(*this);
+	}
 };
 
 struct Canvas
@@ -63,6 +92,17 @@ struct Canvas
 	double m_y;
 	double m_w;
 	double m_h;
+
+	friend class boost::serialization::access;
+
+	template <class Archive>
+	void serialize(Archive& ar, const unsigned int version)
+	{
+		ar& m_x;
+		ar& m_y;
+		ar& m_w;
+		ar& m_h;
+	}
 };
 
 class Enemy
@@ -70,6 +110,15 @@ class Enemy
 public:
 	std::vector<Tower>& getTower() { return m_tower; }
 	std::vector<Footman>& getFootman() { return m_footman; }
+	friend class boost::serialization::access;
+
+	template <class Archive>
+	void serialize(Archive& ar, const unsigned int version)
+	{
+		ar& m_tower;
+		ar& m_footman;
+	}
+
 private:
 	std::vector<Tower> m_tower;
 	std::vector<Footman> m_footman;
@@ -80,6 +129,14 @@ class Self
 public:
 	std::vector<Tower>& getTower() { return m_tower; }
 	std::vector<Footman>& getFootman() { return m_footman; }
+	friend class boost::serialization::access;
+
+	template <class Archive>
+	void serialize(Archive& ar, const unsigned int version)
+	{
+		ar& m_tower;
+		ar& m_footman;
+	}
 private:
 	std::vector<Tower> m_tower;
 	std::vector<Footman> m_footman;
@@ -90,4 +147,32 @@ struct TransData
 	Canvas m_canvas;
 	Enemy m_enemy;
 	Self m_self;
+
+	friend class boost::serialization::access;
+
+	template <class Archive>
+	void serialize(Archive& ar, const unsigned int version)
+	{
+		ar& m_canvas;
+		ar& m_enemy;
+		ar& m_self;
+	}
+};
+
+
+struct MyData {
+	int intValue;
+	double doubleValue;
+	std::string stringValue;
+	std::vector<int> vec;
+
+	friend class boost::serialization::access;
+
+	template<class Archive>
+	void serialize(Archive& ar, const unsigned int version) {
+		ar& intValue;
+		ar& doubleValue;
+		ar& stringValue;
+		ar& vec;
+	}
 };

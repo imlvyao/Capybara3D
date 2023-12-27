@@ -79,6 +79,13 @@
 #include <boost/interprocess/allocators/allocator.hpp>
 #include <boost/interprocess/containers/vector.hpp>
 #include <boost/interprocess/containers/string.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/interprocess/sync/named_mutex.hpp>
+#include <boost/interprocess/sync/scoped_lock.hpp>
+#include <string>
 #include <iostream>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -251,7 +258,7 @@ void updateFrameRate() {
     sumFrameCount++;
     if (sumTime>=1.0)
     {
-        std::cout << "FPS:" << sumFrameCount * 1.0 / sumTime << std::endl;
+        //std::cout << "FPS:" << sumFrameCount * 1.0 / sumTime << std::endl;
         sumTime = 0.0;
         sumFrameCount = 0;
     }
@@ -260,23 +267,10 @@ void updateFrameRate() {
 DrawTool drawTool;
 
 
+boost::interprocess::interprocess_mutex mutex;
+using namespace boost::interprocess;
 int main() 
 {
-    boost::interprocess::managed_shared_memory segment(boost::interprocess::open_only, "SharedMemory");
-
-    // Access TransData object in shared memory
-    TransData* transData = segment.find<TransData>("TransData").first;
-    typedef boost::interprocess::allocator<Tower, boost::interprocess::managed_shared_memory::segment_manager> TowerAllocator;
-    typedef boost::interprocess::vector<Tower, TowerAllocator> SharedTowerVector;
-
-    typedef boost::interprocess::allocator<Footman, boost::interprocess::managed_shared_memory::segment_manager> FootmanAllocator;
-    typedef boost::interprocess::vector<Footman, FootmanAllocator> SharedFootmanVector;
-
-    SharedTowerVector* sharedEnemyTowerVector = segment.find<SharedTowerVector>("SharedEnemyTowerVector").first;
-    SharedFootmanVector* sharedEnemyFootmanVector = segment.find<SharedFootmanVector>("SharedEnemyFootmanVector").first;
-    SharedTowerVector* sharedSelfTowerVector = segment.find<SharedTowerVector>("SharedSelfTowerVector").first;
-    SharedFootmanVector* sharedSelfFootmanVector = segment.find<SharedFootmanVector>("SharedSelfFootmanVector").first;
-
 
     if (!glfwInit()) {
         return -1;
@@ -312,11 +306,74 @@ int main()
             drawTool.getWindowH() * 0.5, -1.0, 1.0); // 设置正交投影
         glMatrixMode(GL_MODELVIEW);
 
-        drawTool.drawCanvas(0,100);
-        drawTool.drawRectangle(50, 80, 20, 10, true, glm::vec3(0, 1, 0));
-        drawTool.drawRectangle(-50, 80, 10, 20, false, glm::vec3(1, 1, 0));
-        drawTool.drawCircle(-50, -80, 20, true, glm::vec3(1, 1, 1));
-        drawTool.drawCircle(50, -80, 10, false, glm::vec3(0, 1, 1));
+
+        TransData receivedDataObject;
+        {
+            const char* sharedMemoryName = "MySharedMemory";
+            const char* mutexName = "MyMutex";
+            const std::size_t sharedMemorySize = 65536;
+            try {
+                boost::interprocess::named_mutex namedMutex(boost::interprocess::open_or_create, mutexName);
+                boost::interprocess::scoped_lock<boost::interprocess::named_mutex> lock(namedMutex);
+                boost::interprocess::managed_shared_memory segment(boost::interprocess::open_or_create, sharedMemoryName, sharedMemorySize);
+
+                // Retrieve the shared memory buffer
+                char* sharedMemoryBuffer = segment.find<char>("SharedMemoryBuffer").first;
+
+                // Get the size of the serialized data
+                std::size_t dataSize = segment.find<char>("SharedMemoryBuffer").second;
+
+                // Deserialize the data from the shared memory buffer
+                std::string receivedData(sharedMemoryBuffer, sharedMemoryBuffer + dataSize);
+
+
+                std::stringstream receivedStream(receivedData);
+                //boost::archive::text_iarchive ia(receivedStream);
+                boost::archive::binary_iarchive ia(receivedStream);
+                ia >> receivedDataObject;
+
+                std::cout << "Received MyData:" << receivedDataObject.m_canvas.m_h << std::endl;
+                // Access and use the deserialized data
+                //std::cout << "Received MyData: " << receivedDataObject.intValue << " " << receivedDataObject.doubleValue << " " << receivedDataObject.stringValue << std::endl;
+
+            }
+            catch (const std::exception& e) {
+                std::cerr << "Exception: " << e.what() << std::endl;
+            }
+        }
+        if (receivedDataObject.m_canvas.m_h>0)
+        {
+            drawTool.setCanvasWidthHeight(receivedDataObject.m_canvas.m_w, receivedDataObject.m_canvas.m_h);
+            drawTool.drawCanvas(receivedDataObject.m_canvas.m_x, receivedDataObject.m_canvas.m_y);
+        }
+
+        {
+            for (Tower& tower: receivedDataObject.m_enemy.getTower())
+            {
+                drawTool.drawCircle(tower.getXY().x, tower.getXY().y, tower.getCollisionRadius(), false, glm::vec3(0, 1, 1));
+                drawTool.drawCircle(tower.getXY().x, tower.getXY().y, tower.getAttackRadius(), true, glm::vec3(0, 1, 1));
+            }
+
+            for (Footman& footman : receivedDataObject.m_enemy.getFootman())
+            {
+                drawTool.drawCircle(footman.getXY().x, footman.getXY().y, footman.getCollisionRadius(), false, glm::vec3(0, 1, 1));
+                drawTool.drawCircle(footman.getXY().x, footman.getXY().y, footman.getAttackRadius(), true, glm::vec3(0, 1, 1));
+            }
+        }
+
+        {
+            for (Tower& tower : receivedDataObject.m_self.getTower())
+            {
+                drawTool.drawCircle(tower.getXY().x, tower.getXY().y, tower.getCollisionRadius(), false, glm::vec3(0, 1, 0));
+                drawTool.drawCircle(tower.getXY().x, tower.getXY().y, tower.getAttackRadius(), true, glm::vec3(0, 1, 0));
+            }
+
+            for (Footman& footman : receivedDataObject.m_self.getFootman())
+            {
+                drawTool.drawCircle(footman.getXY().x, footman.getXY().y, footman.getCollisionRadius(), false, glm::vec3(0, 1, 0));
+                drawTool.drawCircle(footman.getXY().x, footman.getXY().y, footman.getAttackRadius(), true, glm::vec3(0, 1, 0));
+            }
+        }
 
         glfwSwapBuffers(window);
 

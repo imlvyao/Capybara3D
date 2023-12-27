@@ -16,7 +16,7 @@ if(WIN32)
 	link_directories(../../lib/glfw_vc2019)
 	link_libraries(opengl32.lib glfw3.lib glfw3dll.lib glfw3_mt.lib)
 	# 查找Boost库
-	find_package(Boost REQUIRED COMPONENTS system thread)
+	find_package(Boost REQUIRED COMPONENTS system thread serialization)
 	if(Boost_FOUND)
 		# 设置头文件路径
 		include_directories(${Boost_INCLUDE_DIRS})
