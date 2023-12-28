@@ -228,7 +228,7 @@ private:
 };
 
 // 设置目标帧率
-const int targetFPS = 30;
+const int targetFPS = 60;
 
 // 计算帧率相关变量
 double currentTime = 0.0;
@@ -258,7 +258,7 @@ void updateFrameRate() {
     sumFrameCount++;
     if (sumTime>=1.0)
     {
-        //std::cout << "FPS:" << sumFrameCount * 1.0 / sumTime << std::endl;
+        std::cout << "FPS:" << sumFrameCount * 1.0 / sumTime << std::endl;
         sumTime = 0.0;
         sumFrameCount = 0;
     }
@@ -283,7 +283,7 @@ int main()
     }
 
     GLFWwindow* window = glfwCreateWindow(drawTool.getWindowW(), drawTool.getWindowH(), "GLFW Rectangle Example", NULL, NULL);
-
+    glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
     if (!window) 
     {
         glfwTerminate();
@@ -295,6 +295,7 @@ int main()
 
     while (!glfwWindowShouldClose(window)) 
     {
+        glDrawBuffer(GL_BACK);
         glClear(GL_COLOR_BUFFER_BIT);
 
         glMatrixMode(GL_PROJECTION);
@@ -313,6 +314,7 @@ int main()
             const char* mutexName = "MyMutex";
             const std::size_t sharedMemorySize = 65536;
             try {
+                boost::interprocess::named_mutex::remove(mutexName);
                 boost::interprocess::named_mutex namedMutex(boost::interprocess::open_or_create, mutexName);
                 boost::interprocess::scoped_lock<boost::interprocess::named_mutex> lock(namedMutex);
                 boost::interprocess::managed_shared_memory segment(boost::interprocess::open_or_create, sharedMemoryName, sharedMemorySize);
@@ -332,13 +334,14 @@ int main()
                 boost::archive::binary_iarchive ia(receivedStream);
                 ia >> receivedDataObject;
 
-                std::cout << "Received MyData:" << receivedDataObject.m_canvas.m_h << std::endl;
+                //std::cout << "Received MyData:" << receivedDataObject.m_canvas.m_h << std::endl;
                 // Access and use the deserialized data
                 //std::cout << "Received MyData: " << receivedDataObject.intValue << " " << receivedDataObject.doubleValue << " " << receivedDataObject.stringValue << std::endl;
 
             }
             catch (const std::exception& e) {
                 std::cerr << "Exception: " << e.what() << std::endl;
+                continue;
             }
         }
         if (receivedDataObject.m_canvas.m_h>0)

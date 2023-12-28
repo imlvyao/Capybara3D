@@ -7,8 +7,8 @@ class ActorBase
 {
 public:
 	ActorBase(){}
-	ActorBase(const double& x, const double& y, const double& ar, const double& cr):
-	m_x(x),m_y(y), m_attackRadius(ar), m_collisionRadius(cr)
+	ActorBase(const double& x, const double& y, const double& cr, const double& ar):
+	m_x(x),m_y(y), m_collisionRadius(cr), m_attackRadius(ar)
 	{}
 	void setXY(const double& x, const double& y)
 	{
@@ -57,7 +57,7 @@ private:
 class Footman :public ActorBase
 {
 public:
-	Footman(const double& x, const double& y, const double& ar, const double& cr) :ActorBase(x, y, ar, cr)
+	Footman(const double& x, const double& y, const double& cr, const double& ar) :ActorBase(x, y, cr, ar)
 	{}
 	Footman() {}
 	friend class boost::serialization::access;
@@ -72,7 +72,7 @@ public:
 class Tower :public ActorBase
 {
 public:
-	Tower(const double& x, const double& y, const double& ar, const double& cr) :ActorBase(x,y,ar,cr)
+	Tower(const double& x, const double& y, const double& cr, const double& ar) :ActorBase(x,y,cr,ar)
 	{}
 	Tower(){}
 	friend class boost::serialization::access;
@@ -156,23 +156,5 @@ struct TransData
 		ar& m_canvas;
 		ar& m_enemy;
 		ar& m_self;
-	}
-};
-
-
-struct MyData {
-	int intValue;
-	double doubleValue;
-	std::string stringValue;
-	std::vector<int> vec;
-
-	friend class boost::serialization::access;
-
-	template<class Archive>
-	void serialize(Archive& ar, const unsigned int version) {
-		ar& intValue;
-		ar& doubleValue;
-		ar& stringValue;
-		ar& vec;
 	}
 };

@@ -150,7 +150,7 @@ int main()
         catch (const std::exception& e) {
             std::cerr << "Exception: " << e.what() << std::endl;
         }
-        //Sleep(100);
+        Sleep(1);
         ra += 0.1;
     }
     // The shared memory will be automatically released when all processes are done
