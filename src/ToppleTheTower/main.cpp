@@ -90,14 +90,20 @@
 #include <boost/interprocess/sync/scoped_lock.hpp>
 #include <iostream>
 #include <string>
-#include "ToppleTheTower/Actor.h"
+#include "ToppleTheTower/All.h"
 
 boost::interprocess::interprocess_mutex mutex;
 using namespace boost::interprocess;
+using namespace Singleton;
 
 
 int main()
 {
+    auto c1 = _d().createObject<ObjectBase>();
+    auto c2 = _d().createObject<Object>();
+    auto c3 = _d().createObject<Error>();
+    auto cc2 = _d().getObject(c2);
+
     const char* sharedMemoryName = "MySharedMemory";
     const char* mutexName = "MyMutex";
     const std::size_t sharedMemorySize = 65536; // Adjust the size according to your needs

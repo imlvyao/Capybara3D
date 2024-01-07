@@ -343,6 +343,11 @@ int main()
                 std::cerr << "Exception: " << e.what() << std::endl;
                 continue;
             }
+            catch (...)
+            {
+                std::cerr << "Exception: ?" << std::endl;
+                continue;
+            }
         }
         if (receivedDataObject.m_canvas.m_h>0)
         {
