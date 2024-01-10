@@ -39,7 +39,7 @@ elseif(UNIX)
 
 endif()
 
-ADD_EXE(${HEADER_PATH} ${LIB_NAME})
+ADD_EXE(${CMAKE_CURRENT_SOURCE_DIR} ${LIB_NAME})
 
 # 依赖
 LINKDLL_AND_COPY(${LIB_NAME} Utility)

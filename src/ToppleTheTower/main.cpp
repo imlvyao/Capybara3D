@@ -96,13 +96,89 @@ boost::interprocess::interprocess_mutex mutex;
 using namespace boost::interprocess;
 using namespace Singleton;
 
+void test()
+{
+    // test
+    auto c1 = _d().createObject<ObjectBase>();
+
+    // 示例点、线段和圆弧
+    //LineSegment line(glm::vec2(0.0f, 0.0f), glm::vec2(4.0f, 2.0f));
+    LineSegment line(glm::vec2(1.0f, 1.0f), glm::vec2(5.0f, 0.0f));
+
+    Arc arc(glm::vec2(1.0f, 1.0f), 1.0f, 0.0f, glm::pi<float>());  // 半圆弧
+
+    // 检查相交并计算交点
+    glm::vec2 ipt1, ipn1, ipt2, ipn2;
+    if (glm::intersectLineSphere(line.start, line.end, arc.center, arc.radius, ipt1, ipn1, ipt2, ipn2))
+    {
+        std::cout << "线段与圆弧相交，交点坐标: (" << ipt1.x << ", " << ipt1.y << ")\n";
+        std::cout << "线段与圆弧相交，交点坐标: (" << ipt2.x << ", " << ipt2.y << ")\n";
+    }
+    else
+    {
+        std::cout << "线段与圆弧不相交\n";
+    }
+
+    {
+        {
+            LineSegment line(glm::vec2(1.0f, 1.0f), glm::vec2(5.0f, 0.0f));
+            glm::vec2 pt1(0, 0);
+            glm::vec2 pt2(2.5f, 0.5f);
+            bool b1 = Collision::isPointOnLineSegment(pt1, line);
+            bool b2 = Collision::isPointOnLineSegment(pt2, line);
+        }
+
+        {
+            Arc arc1(glm::vec2(1.0f, 1.0f), 1.0f, 0.0f, glm::pi<float>());  // 半圆弧
+            glm::vec2 pt1(1, 1);
+            glm::vec2 pt2(5, 5);
+            glm::vec2 pt3(2, 1);
+            glm::vec2 pt4(0, 1);
+            glm::vec2 pt5(1, 2);
+            glm::vec2 pt6(1, 0);
+            bool b1 = Collision::isPointOnArc(pt1, arc1);
+            bool b2 = Collision::isPointOnArc(pt2, arc1);
+            bool b3 = Collision::isPointOnArc(pt3, arc1);
+            bool b4 = Collision::isPointOnArc(pt4, arc1);
+            bool b5 = Collision::isPointOnArc(pt5, arc1);
+            bool b6 = Collision::isPointOnArc(pt6, arc1);
+            int i = 0;
+        }
+        {
+            Arc arc1(glm::vec2(1.0f, 1.0f), 1.0f, 0.0f, glm::pi<float>());  // 半圆弧
+            LineSegment line1(glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 2.0f));
+            LineSegment line2(glm::vec2(0.0f, 0.0f), glm::vec2(5.0f, 0.0f));
+            LineSegment line3(glm::vec2(0.0f, 1.2f), glm::vec2(2.0f, 2.0f));
+            LineSegment line4(glm::vec2(1.0f, 1.0f), glm::vec2(2.0f, 2.0f));
+            LineSegment line5(glm::vec2(0.0f, 2.0f), glm::vec2(0.8f, 2.0f));
+
+            glm::vec2 pt1(0, 0);
+            glm::vec2 pt2(0,0);
+
+            bool b1 = Collision::findLineSegment2ArcIntersection(line1, arc1, &pt1, &pt2);
+            bool b2 = Collision::findLineSegment2ArcIntersection(line2, arc1, &pt1, &pt2);
+            bool b3 = Collision::findLineSegment2ArcIntersection(line3, arc1, &pt1, &pt2);
+            bool b4 = Collision::findLineSegment2ArcIntersection(line4, arc1, &pt1, &pt2);
+            bool b5 = Collision::findLineSegment2ArcIntersection(line5, arc1, &pt1, &pt2);
+            int i = 0;
+        }
+        {
+            CollisionCircle* c1 = new CollisionCircle(0.5f);
+            CollisionBase* c2 = new CollisionBox(M_PI/180.0*30.0,1.732,1);
+            double allow(-1);
+            bool b = Collision::isWillBeCollided(c1, glm::vec2(-1, 0), glm::vec2(0.6, 0),
+                c2, glm::vec2(1, 0), allow);
+            int i = 0;
+        }
+        int i = 0;
+    }
+}
 
 int main()
 {
-    auto c1 = _d().createObject<ObjectBase>();
-    auto c2 = _d().createObject<Object>();
-    auto c3 = _d().createObject<Error>();
-    auto cc2 = _d().getObject(c2);
+    {
+        test();
+    }
 
     const char* sharedMemoryName = "MySharedMemory";
     const char* mutexName = "MyMutex";
