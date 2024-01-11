@@ -22,6 +22,7 @@ endif()
 
 if(WIN32)
     message(NOTICE "System Type:Windows!")
+    add_compile_definitions(WIN32)
     #set(CMAKE_SYSTEM_VERSION 10)
     #set(VCPKG_TARGET_ARCHITECTURE x64)
     set(VCPKG_CRT_LINKAGE dynamic)
